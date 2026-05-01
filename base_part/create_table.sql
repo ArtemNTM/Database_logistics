@@ -1,6 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS logistics;
 
-CREATE TABLE IF NOT EXISTS logistics.CLients(
+CREATE TABLE IF NOT EXISTS logistics.Clients(
 	client_id SERIAL PRIMARY KEY,
 	first_name VARCHAR(100) NOT NULL,
 	last_name VARCHAR(100) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS logistics.Warehouse (
     city VARCHAR(100) NOT NULL,
     street VARCHAR(255) NOT NULL,
     building VARCHAR(10) NOT NULL,
-    capacity DECIMAL(10,2) NOT NULL CHECK(capacity > 0),
+    capacity DECIMAL(20, 2) NOT NULL CHECK(capacity > 0),
     current_load DECIMAL(10,2) DEFAULT 0 CHECK(current_load BETWEEN 0 AND capacity)
 );
 
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS logistics.Orders (
     product_type VARCHAR(100) NOT NULL CHECK(product_type IN ('standard', 'fragile', 'perishable', 'oversized', 'hazardous')),
     delivery_cost DECIMAL NOT NULL CHECK(delivery_cost >= 0),
     order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    status VARCHAR(50) NOT NULL CHECK(status IN ('created', 'in_progress', 'delivered', 'cancelled'))
+    status VARCHAR(50) NOT NULL CHECK(status IN ('created', 'in_progress', 'delivered', 'cancelled', 'lost'))
 );
 
 CREATE TABLE IF NOT EXISTS logistics.Couriers (
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS logistics.Delivery_logs (
     receive_dt TIMESTAMP CHECK(receive_dt < plan_dt AND receive_dt < actual_dt),
     plan_dt TIMESTAMP NOT NULL,
     actual_dt TIMESTAMP,
-    stage_status VARCHAR(50) NOT NULL CHECK(stage_status IN ('pending', 'in_progress', 'completed', 'cancelled')),
+    stage_status VARCHAR(50) NOT NULL CHECK(stage_status IN ('pending', 'in_progress', 'completed', 'cancelled', 'lost')),
 
     CHECK(
         (stage_type = 'transit' AND dst_wh_id IS NOT NULL) OR 
